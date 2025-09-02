@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#2F3E8C" />
+      <stop offset="0.6" stop-color="#0F6F73" />
+      <stop offset="1" stop-color="#F5B642" />
+    </linearGradient>
+    <style>
+      .bg{fill:#F8F3EA}
+      .grad{fill:url(#g);opacity:0.12}
+      .title{font-family:Playfair Display, serif; font-size:56px; fill:#2B2B2E}
+      .names{font-family:Playfair Display, serif; font-size:72px; font-style:italic; fill:#2F3E8C}
+      .meta{font-family:Inter, sans-serif; font-size:28px; fill:#2B2B2E}
+    </style>
+  </defs>
+  <rect width="1200" height="630" class="bg"/>
+  <circle cx="960" cy="120" r="220" class="grad"/>
+  <g transform="translate(80,120)">
+    <text x="0" y="60" class="names">Lakshmikanth &amp; Maanya</text>
+    <text x="0" y="120" class="meta">Engagement • 13 Oct 2025 • 12:30 PM</text>
+  </g>
+</svg>
