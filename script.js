@@ -1,137 +1,218 @@
-// Lightweight script for countdown (IST), terminal typing, share and tiny animations
+// Countdown, terminal interactions, share actions, petals & reveal logic
 (function(){
-  const EVENT_ISO = '2025-10-13T12:30:00+05:30';
-  const eventDate = new Date(EVENT_ISO);
+  const targetDateIST = '2025-10-13T07:00:00Z'; // 12:30 PM IST = 07:00 UTC
+  const countdownEl = document.getElementById('countdown-timer');
+  const postMsg = document.getElementById('post-countdown-message');
+  const countdownSection = document.getElementById('countdown-section');
+  const surpriseSection = document.getElementById('surprise');
 
-  // Helpers
-  function pad(n){return String(n).padStart(2,'0')}
+  function pad(n){ return n.toString().padStart(2,'0'); }
 
-  // Countdown
+  function buildBoxes(){
+    const labels = ['Days','Hours','Minutes','Seconds'];
+    labels.forEach(l => {
+      const box = document.createElement('div');
+      box.className = 'flex flex-col items-center bg-white/70 backdrop-blur-sm px-4 py-3 rounded-md shadow border border-gold/30 min-w-[80px]';
+      box.innerHTML = `<span class="value text-2xl font-semibold text-gold">00</span><span class="text-xs mt-1 tracking-wide">${l}</span>`;
+      countdownEl.appendChild(box);
+    });
+  }
+  buildBoxes();
+
   function updateCountdown(){
-    const now = new Date();
-    const diff = eventDate - now;
+    const now = new Date().getTime();
+    const target = new Date(targetDateIST).getTime();
+    let diff = target - now;
     if(diff <= 0){
-      document.querySelectorAll('[data-unit]').forEach(el=>el.textContent='00');
+      clearInterval(timer);
+      countdownEl.classList.add('opacity-0','transition');
+      setTimeout(()=>{
+        countdownEl.remove();
+        postMsg.classList.remove('hidden');
+        document.body.classList.add('reveal-active');
+        launchLotusPetals();
+        revealSurprise();
+      }, 800);
       return;
     }
-    const secs = Math.floor(diff/1000);
-    const days = Math.floor(secs/86400);
-    const hours = Math.floor((secs%86400)/3600);
-    const mins = Math.floor((secs%3600)/60);
-    const s = secs%60;
-    document.querySelector('[data-unit="days"]').textContent = days;
-    document.querySelector('[data-unit="hours"]').textContent = pad(hours);
-    document.querySelector('[data-unit="minutes"]').textContent = pad(mins);
-    document.querySelector('[data-unit="seconds"]').textContent = pad(s);
+    const d = Math.floor(diff / (1000*60*60*24));
+    diff -= d*24*60*60*1000;
+    const h = Math.floor(diff / (1000*60*60));
+    diff -= h*60*60*1000;
+    const m = Math.floor(diff / (1000*60));
+    diff -= m*60*1000;
+    const s = Math.floor(diff / 1000);
+    const values = [d,h,m,s];
+    [...countdownEl.querySelectorAll('.value')].forEach((el,i)=> el.textContent = pad(values[i]));
   }
+  const timer = setInterval(updateCountdown,1000); updateCountdown();
 
-  // Start countdown tick
-  if(document.getElementById('countdown')){
-    updateCountdown();
-    setInterval(updateCountdown,1000);
-  }
-
-  // Terminal typing effect
-  const terminalLines = [
-    '> booting relationship.kernel',
-    '> handshakes passed',
-    '> dependency lock: trust@stable, respect@latest',
-    '> deploying engagement --time 2025-10-13T12:30:00+05:30',
-    '> status: SUCCESS ✅'
-  ];
-
-  function typeInTerminal(el, lines, delay=40){
-    const code = el.querySelector('code');
-    let i=0, li=0, txt='';
-    function step(){
-      if(li>=lines.length) return;
-      const line = lines[li];
-      if(i<=line.length){
-        code.textContent = lines.slice(0,li).join('\n') + (li? '\n':'') + line.slice(0,i);
-        i++;
-        setTimeout(step, delay + Math.random()*20);
-      } else {
-        li++; i=0; setTimeout(step, 300);
-      }
+  // Lotus petals after countdown
+  function launchLotusPetals(){
+    const container = document.getElementById('lotus-petals');
+    for(let i=0;i<25;i++){
+      const p = document.createElement('div');
+      p.className='petal';
+      p.style.left = Math.random()*100+'%';
+      p.style.animationDelay = (Math.random()*5)+'s';
+      p.style.animationDuration = 5+ Math.random()*6 + 's';
+      container.appendChild(p);
     }
-    step();
   }
 
-  const term = document.getElementById('terminal');
-  if(term){
-    typeInTerminal(term, terminalLines, 28);
-    // uptime bar progress toward event
-    const fill = document.getElementById('uptime-fill');
-    function updateUptime(){
-      const now = new Date();
-      const total = eventDate - new Date();
-      // progress from now toward event (0% -> now, 100% -> event)
-      // to show some motion, compute percent of month? Use days until event relative to 180 days window
-      const daysLeft = Math.max(0, Math.round((eventDate - now)/86400000));
-      const pct = Math.max(0, Math.min(100, 100 - (daysLeft/180)*100));
-      fill.style.width = pct + '%';
+  // Surprise reveal section
+  function revealSurprise(){
+    surpriseSection.classList.remove('hidden');
+    const photo = document.getElementById('reveal-photo');
+    // If an image exists, set it as background
+    // photo.style.background = 'url(assets/images/couple_photo.jpg) center/cover';
+    setTimeout(()=> photo.style.opacity = 1, 400);
+  }
+
+  // Terminal logic
+  const form = document.getElementById('terminal-form');
+  const input = document.getElementById('terminal-input');
+  const output = document.getElementById('terminal-output');
+
+  const QA = {
+    'who is the bride?': 'Maanya.',
+    'who is the groom?': 'Lakshmikanth.',
+    'where is the venue?': 'Sampradaya Convention Hall, Near Pandavapura Railway Station (see map above).',
+    'when is the engagement?': '13 Oct 2025 at 12:30 PM IST.',
+  };
+
+  const EasterEggResponse = 'Secret marriage date: 8 March 2026 (shh!)';
+
+  function appendLine(text, cls=''){ const div=document.createElement('div'); div.textContent=text; if(cls) div.className=cls; output.appendChild(div); output.scrollTop = output.scrollHeight; }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const q = input.value.trim(); if(!q) return;
+    appendLine('$ '+q,'text-green-400');
+    const key = q.toLowerCase();
+    if(key === 'help'){
+      showHelp();
+    } else if(key.includes('marriage')){
+      typeWriter(EasterEggResponse);
+    } else if(QA[key]) {
+      appendLine(QA[key]);
+    } else {
+      appendLine('Sorry, I do not know. Try: "Who is the bride?"');
     }
-    updateUptime(); setInterval(updateUptime, 60000);
+    input.value='';
+  });
+
+  function showHelp(){
+    appendLine('Available commands:', 'text-gold-300');
+    Object.keys(QA).forEach(k => appendLine('- '+k));
+    appendLine("Hint: ask about 'marriage' for a secret.");
   }
 
-  // Simple share handlers
-  const shareBtn = document.getElementById('share-btn');
-  if(shareBtn){
-    shareBtn.addEventListener('click', async ()=>{
-      const url = location.href;
-      const title = document.title;
-      if(navigator.share){
-        try{ await navigator.share({title, url}); }
-        catch(e){}
-      } else {
-        // fallback: copy link
-        try{ await navigator.clipboard.writeText(url); alert('Link copied to clipboard'); }
-        catch(e){ prompt('Copy this link', url); }
+  function typeWriter(text){
+    const span = document.createElement('div');
+    span.className='typewriter text-pink-300';
+    output.appendChild(span);
+    let i=0;
+    const interval = setInterval(()=>{
+      span.textContent = text.slice(0,i+1);
+      i++;
+      output.scrollTop = output.scrollHeight;
+      if(i>=text.length){ clearInterval(interval); span.classList.remove('typewriter'); }
+    }, 60);
+  }
+
+  // Scroll celebration events (petals throughout scroll)
+  let scrollSpawned = 0;
+  window.addEventListener('scroll', () => {
+    const celebration = document.getElementById('celebration');
+    const rect = celebration.getBoundingClientRect();
+    if(rect.top < window.innerHeight && scrollSpawned < 1){
+      spawnScrollingPetals();
+      fadeInTimeline();
+      scrollSpawned++;
+    }
+  });
+
+  function spawnScrollingPetals(){
+    for(let i=0;i<30;i++){
+      const p=document.createElement('div');
+      p.className='petal falling';
+      p.style.left=Math.random()*100+'vw';
+      p.style.animationDelay=Math.random()*10+'s';
+      p.style.animationDuration= 8+Math.random()*6+'s';
+      document.body.appendChild(p);
+      setTimeout(()=> p.remove(), 16000);
+    }
+  }
+
+  function fadeInTimeline(){
+    const t = document.getElementById('timeline');
+    t.classList.remove('opacity-0');
+    t.classList.add('opacity-100');
+  }
+
+  // Share buttons
+  const shareHandlers = {
+    whatsapp: () => {
+      const url = encodeURIComponent(window.location.href);
+      const text = encodeURIComponent('Join us for our engagement on 13 Oct 2025!');
+      window.open(`https://wa.me/?text=${text}%20${url}`,'_blank');
+    },
+    email: () => {
+      const subject = encodeURIComponent('Engagement Invitation - 13 Oct 2025');
+      const body = encodeURIComponent('With the blessings of God, we invite you to our engagement on 13 Oct 2025. Venue: Sampradaya Convention Hall, Near Pandavapura Railway Station.');
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    },
+    copy: () => {
+      navigator.clipboard.writeText(window.location.href).then(()=>{
+        alert('Link copied to clipboard!');
+      });
+    }
+  };
+
+  document.querySelectorAll('[data-share]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.getAttribute('data-share');
+      shareHandlers[type]?.();
+    });
+  });
+
+  // Audio removed as per user preference
+
+  /* ---------- Scroll Reveal System ---------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        if(entry.target.matches('[data-petals]')){
+          spawnNamePetals(entry.target.querySelector('.petal-layer'));
+        }
+        io.unobserve(entry.target);
       }
     });
+  }, { threshold: 0.3 });
+  revealEls.forEach(el => io.observe(el));
+
+  /* ---------- Name Petals Effect ---------- */
+  function spawnNamePetals(layer){
+    if(!layer) return;
+    const TOTAL = 18;
+    const rect = layer.getBoundingClientRect();
+    for(let i=0;i<TOTAL;i++){
+      const p = document.createElement('div');
+      p.className='name-petal';
+      const angle = (Math.random()*Math.PI*2);
+      const radius = 60 + Math.random()*80;
+      const tx = Math.cos(angle)*radius;
+      const ty = Math.sin(angle)*radius;
+      p.style.setProperty('--tx', tx+'px');
+      p.style.setProperty('--ty', ty+'px');
+      p.style.left = (rect.width/2 - 12) + 'px';
+      p.style.top = (rect.height/2 - 12) + 'px';
+      p.style.animationDelay = (Math.random()*0.8)+'s';
+      layer.appendChild(p);
+      setTimeout(()=> p.remove(), 6000);
+    }
   }
-
-  // Add to calendar (ICS download)
-  const addCal = document.getElementById('add-calendar');
-  if(addCal){
-    addCal.addEventListener('click', ()=>{
-      // compute UTC start/end from eventDate (IST provided in ISO)
-      const dtStart = formatICS(eventDate);
-      const dtEnd = formatICS(new Date(eventDate.getTime() + 2*60*60*1000)); // 2 hour event
-      const icsLines = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//engagement-invitation//EN',
-        'BEGIN:VEVENT',
-        `UID:engagement-20251013-${dtStart}@example.com`,
-        `DTSTAMP:${formatICS(new Date())}`,
-        `DTSTART:${dtStart}`,
-        `DTEND:${dtEnd}`,
-        'SUMMARY:Engagement – Lakshmikanth & Maanya',
-        'LOCATION:Sampradaya Convention Hall, Near Pandavapura Railway Station',
-        'DESCRIPTION:Engagement Ceremony',
-        'END:VEVENT',
-        'END:VCALENDAR'
-      ];
-      const ics = icsLines.join('\r\n');
-      const blob = new Blob([ics],{type:'text/calendar'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href=url; a.download='engagement-lakshmikanth-maanya.ics'; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),1000);
-    });
-  }
-
-  function formatICS(d){
-    function z(n){return String(n).padStart(2,'0')}
-    return d.getUTCFullYear()+z(d.getUTCMonth()+1)+z(d.getUTCDate())+'T'+z(d.getUTCHours())+z(d.getUTCMinutes())+z(d.getUTCSeconds())+'Z';
-  }
-
-  // Intersection animations (simple)
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting) e.target.classList.add('in-view');
-    });
-  },{threshold:0.12});
-  document.querySelectorAll('.commit, .section-title, .terminal, .hero-title').forEach(el=>io.observe(el));
-
 })();

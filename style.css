@@ -1,0 +1,130 @@
+/* Theme Variables */
+:root {
+  --cream: #fef7f1;
+  --gold: #c49b63;
+  --lotus1: #f4b1c2;
+  --lotus2: #f48fb1;
+  --leafy: #88b04b;
+  --terminal-bg: #0a0a0a;
+  --terminal-text: #d1f7c4;
+}
+
+body { background: var(--cream); }
+
+/* Decorative layered background */
+.decorative-bg { position:relative; }
+.pattern-overlay { position:fixed; inset:0; background:url('assets/images/temple_arch_pattern.svg') center top/600px repeat-y; opacity:0.15; mix-blend-mode:multiply; }
+
+/* Header arch subtle gradient */
+.header-arch { background:linear-gradient(to bottom, rgba(244,177,194,0.25), rgba(254,247,241,0)); border-bottom:1px solid rgba(196,155,99,0.25); }
+
+.lotus-row img { transition: transform .6s ease, filter .6s; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+.lotus-row img:hover { transform:translateY(-6px) scale(1.15) rotate(-3deg); filter:drop-shadow(0 4px 10px rgba(196,155,99,0.6)); }
+
+/* Om glyph styling */
+/* Simplified Om glyph for better legibility */
+.om-glyph {
+  position:relative;
+  font-size:4.2rem;
+  line-height:1;
+  font-family: 'Sacramento', cursive;
+  font-weight:600;
+  color: var(--gold);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.18);
+  padding:.4rem .7rem;
+  letter-spacing:1px;
+}
+.om-glyph::before {
+  content:"";
+  position:absolute; inset:-3px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.6);
+  box-shadow:0 0 0 1px rgba(196,155,99,0.45), 0 2px 5px rgba(0,0,0,0.18);
+  z-index:-1;
+}
+/* Removed spinning overlay for clarity */
+@keyframes spin { to { transform:rotate(360deg);} }
+
+/* Utility Buttons */
+.btn-gold {
+  background: var(--gold);
+  color:#fff;
+  padding:0.5rem 1rem;
+  border-radius:9999px;
+  font-size:0.875rem;
+  font-weight:600;
+  box-shadow:0 2px 4px rgba(0,0,0,0.15);
+  transition:all .3s ease;
+  display:inline-block;
+}
+.btn-gold:hover { filter:brightness(1.1); box-shadow:0 4px 12px rgba(0,0,0,0.25); }
+.btn-outline {
+  background:transparent;
+  color:var(--gold);
+  border:1px solid var(--gold);
+  padding:0.5rem 1rem;
+  border-radius:9999px;
+  font-size:0.875rem;
+  font-weight:600;
+  box-shadow:0 1px 2px rgba(0,0,0,0.08);
+  transition:all .3s ease;
+  display:inline-block;
+}
+.btn-outline:hover { background:var(--gold); color:#fff; }
+
+/* Terminal */
+.terminal-window { background: #111; border: 2px solid #222; }
+
+/* Simple fade animations */
+@keyframes fade-in { from { opacity:0; transform: translateY(12px);} to { opacity:1; transform: translateY(0);} }
+.animate-fade-in { animation: fade-in 1s ease both; }
+.animate-fade-in-slow { animation: fade-in 1.4s ease both; }
+.animate-fade-in-delayed { animation: fade-in 1.8s ease both; }
+
+/* Lotus Petal Animation */
+.petal { position:absolute; width:32px; height:32px; background: radial-gradient(circle at 30% 30%, var(--lotus2), var(--lotus1)); opacity:0.85; border-radius: 60% 40% 60% 40%; animation: float-down 7s linear infinite; }
+@keyframes float-down {
+  0% { transform: translateY(-10vh) rotate(0deg) scale(0.8); opacity:0; }
+  10% { opacity:1; }
+  100% { transform: translateY(90vh) rotate(360deg) scale(1); opacity:0; }
+}
+
+/* Scroll celebration petals container */
+#celebration { overflow:hidden; }
+.falling { position:fixed; top:-5vh; pointer-events:none; z-index:10; animation: float-down 10s linear infinite; }
+
+/* Timeline items */
+.timeline-item { background:rgba(255,255,255,0.6); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); border-radius:0.75rem; padding:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.15); border:1px solid rgba(196,155,99,0.2); }
+
+/* Glow effect for buttons */
+.btn-gold, .btn-outline { position:relative; }
+.btn-gold::after, .btn-outline::after { content:""; position:absolute; inset:0; border-radius:inherit; box-shadow:0 0 0px var(--gold); opacity:0; transition:0.4s; }
+.btn-gold:hover::after, .btn-outline:hover::after { box-shadow:0 0 12px var(--gold); opacity:1; }
+
+/* Post countdown background transition */
+body.reveal-active { animation: reveal-bg 3s ease forwards; }
+@keyframes reveal-bg { from { background: var(--cream);} to { background: linear-gradient(135deg, var(--lotus1), var(--gold), var(--lotus2)); background-size:200% 200%; animation: gradient-move 12s ease infinite; } }
+@keyframes gradient-move { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
+
+/* Typewriter */
+.typewriter { overflow:hidden; border-right: 2px solid var(--gold); white-space:nowrap; animation: caret 1s steps(1) infinite; }
+@keyframes caret { 50% { border-color: transparent; } }
+
+/* Reveal animation */
+.reveal { opacity:0; transform: translateY(40px) scale(.98); transition: opacity .9s ease, transform 1s cubic-bezier(.17,.67,.3,1); }
+.reveal.visible { opacity:1; transform: translateY(0) scale(1); }
+
+/* Name petal effect */
+.name-wrapper { position:relative; }
+.petal-layer { position:absolute; inset:0; pointer-events:none; overflow:visible; }
+.name-petal { position:absolute; width:24px; height:24px; background:radial-gradient(circle at 30% 30%, var(--lotus2), var(--lotus1)); border-radius:60% 40% 60% 40%; opacity:0; animation: name-petal 5.5s linear forwards; }
+@keyframes name-petal { 0% { transform: translate(0,0) scale(.3) rotate(0deg); opacity:0; } 8% { opacity:.9; } 70% { opacity:.9; } 100% { transform: translate(var(--tx), var(--ty)) scale(1) rotate(360deg); opacity:0; } }
+
+/* Terminal send button tweak */
+#terminal-send { border-left:1px solid #1f2937; }
+#terminal-send:hover { filter:brightness(1.1); }
+
+/* Responsive tweaks */
+@media (max-width:640px){
+  h1 { font-size:3.2rem !important; }
+}

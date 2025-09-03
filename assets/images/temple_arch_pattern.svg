@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" fill="none">
+  <defs>
+    <pattern id="arch" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M0 40 Q20 0 40 40" stroke="#c49b63" stroke-width="2" fill="none"/>
+      <path d="M0 40 Q20 10 40 40" stroke="#f4b1c2" stroke-width="1" fill="none"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fef7f1"/>
+      <stop offset="1" stop-color="#fef7f1" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="200" fill="url(#arch)"/>
+  <rect width="400" height="200" fill="url(#fade)"/>
+</svg>
